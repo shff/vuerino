@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <main id="main">
+    <btn label="hello" />
+  </main>
+
+  <script src="https://unpkg.com/vue"></script>
+  <script>
+    const requireVue = async path => {
+      const response = await fetch(path);
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      const { innerHTML: template } = doc.querySelector("template");
+      const { textContent: script } = doc.querySelector("script");
+      const { textContent: style } = doc.querySelector("style");
+
+      const blob = new Blob([ script ], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      const { default: module } = await import(url);
+
+      const sheet = document.createElement("style");
+      sheet.type = "text/css";
+      sheet.innerText = style;
+      document.head.appendChild(sheet);
+
+      return { ...module, template };
+    };
+
+    (async () => {
+      const btn = await requireVue("button.vue");
+      new Vue({ components: { btn }, template: "#main" }).$mount("main");
+    })();
+  </script>
+</body>
+</html>
