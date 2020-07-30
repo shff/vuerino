@@ -6,12 +6,12 @@
 </head>
 <body>
   <main id="main">
-    <btn label="hello" />
+    <app />
   </main>
 
   <script src="https://unpkg.com/vue"></script>
   <script>
-    const requireVue = async path => {
+    window.requireVue = path => async () => {
       const response = await fetch(path);
       const html = await response.text();
       const doc = new DOMParser().parseFromString(html, "text/html");
@@ -20,7 +20,7 @@
       const { textContent: script } = doc.querySelector("script");
       const { textContent: style } = doc.querySelector("style");
 
-      const blob = new Blob([ script ], { type: 'application/javascript' });
+      const blob = new Blob([ script ], { type: "application/javascript" });
       const url = URL.createObjectURL(blob);
       const { default: module } = await import(url);
 
@@ -32,10 +32,11 @@
       return { ...module, template };
     };
 
-    (async () => {
-      const btn = await requireVue("button.vue");
-      new Vue({ components: { btn }, template: "#main" }).$mount("main");
-    })();
+    const app = requireVue("app.vue");
+    new Vue({
+      el: "#main",
+      components: { app }
+    });
   </script>
 </body>
 </html>

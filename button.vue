@@ -14,5 +14,5 @@
 </script>
 
 <style>
-body { background: #eee; }
+button { background: #aaa; }
 </style>
